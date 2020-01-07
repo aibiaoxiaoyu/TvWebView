@@ -9,13 +9,13 @@ import android.webkit.WebView;
  * Created by Administrator on 2017/7/12.
  */
 
-public class CustomWebView extends WebView {
+public class TvWebView extends WebView {
 
-    public CustomWebView(Context context){
+    public TvWebView(Context context){
         super(context);
     }
 
-    public CustomWebView(Context context, AttributeSet attrs) {
+    public TvWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

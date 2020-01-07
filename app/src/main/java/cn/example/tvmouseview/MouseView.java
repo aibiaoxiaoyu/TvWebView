@@ -17,8 +17,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 /**
- * 模拟鼠标视图，测试用
- * Created by Administrator on 2017/7/5.
+ * 模拟鼠标视图
+ * Created by Administrator
  */
 
 public class MouseView extends FrameLayout {
@@ -26,18 +26,19 @@ public class MouseView extends FrameLayout {
     private int mOffsetX;
     private int mOffsetY;
 
+    private Bitmap mMouseBitmap;
     private ImageView mMouseView;
 
-    private Bitmap mMouseBitmap;
 
     private int mMouseX = 0;
     private int mMouseY = 0;
 
     //鼠标移动距离  px
-    private int mMoveDis = 35;
+    private int mMoveDis = 15;
 
-    public MouseView(@NonNull Context context){
-        super(context,null);
+
+    public MouseView(@NonNull Context context) {
+        super(context, null);
         init();
     }
 
@@ -51,39 +52,39 @@ public class MouseView extends FrameLayout {
      * 初始化鼠标
      */
     private void init() {
-        Drawable drawable =	getResources().getDrawable(
-                R.mipmap.mouse);
+        Drawable drawable = getResources().getDrawable(R.mipmap.mouse);
         mMouseBitmap = drawableToBitamp(drawable);
         mMouseView = new ImageView(getContext());
         mMouseView.setImageBitmap(mMouseBitmap);
         addView(mMouseView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+
         mOffsetX = mMouseBitmap.getWidth();
         mOffsetY = mMouseBitmap.getHeight();
 
-        mMouseX = 100;
-        mMouseY = 100;
+        mMouseX = 640;
+        mMouseY = 360;
 
         setMouseShow();
     }
 
     /**
      * 生成一个鼠标图片
+     *
      * @param drawable
      * @return
      */
     private Bitmap drawableToBitamp(Drawable drawable) {
         BitmapDrawable bd = (BitmapDrawable) drawable;
         Bitmap bitmap = bd.getBitmap();
-        return Bitmap.createScaledBitmap(bitmap, 50,50,true);
+        return Bitmap.createScaledBitmap(bitmap, 30, 30, true);
     }
-
 
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        if(mMouseView != null){
-            mMouseView.layout(mMouseX,mMouseY,mMouseX + mMouseView.getMeasuredWidth(), mMouseY + mMouseView.getMeasuredHeight());
+        if (mMouseView != null) {
+            mMouseView.layout(mMouseX, mMouseY, mMouseX + mMouseView.getMeasuredWidth(), mMouseY + mMouseView.getMeasuredHeight());
         }
     }
 
@@ -116,74 +117,76 @@ public class MouseView extends FrameLayout {
     /**
      * 设置鼠标显示，不移动鼠标10秒后隐藏
      */
-    private void setMouseShow(){
+    private void setMouseShow() {
         mMouseView.setVisibility(VISIBLE);
         mHandler.removeCallbacks(hideRunnable);
-        mHandler.postDelayed(hideRunnable,10000);
+        mHandler.postDelayed(hideRunnable, 10000);
     }
 
     /**
      * 按键监听
-     *
+     * <p>
      * 模拟鼠标点击要 发送 ACTION_DOWN ACTION_UP 两个事件才会生效
+     *
      * @param webView
      * @param event
      */
-    public void moveMouse(CustomWebView webView,KeyEvent event) {
-        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+    public void moveMouse(TvWebView webView, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
             setMouseShow();
             switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_LEFT:
-                    if(mMouseX - mMoveDis >= 0) {
+                case KeyEvent.KEYCODE_DPAD_LEFT://左
+                    if (mMouseX - mMoveDis >= 0) {
                         mMouseX -= mMoveDis;
-                    }else{
+                    } else {
                         mMouseX = 0;
                     }
-                    sendMotionEvent(webView,mMouseX , mMouseY,MotionEvent.ACTION_HOVER_MOVE);
+                    sendMotionEvent(webView, mMouseX, mMouseY, MotionEvent.ACTION_HOVER_MOVE);
                     requestLayout();
                     break;
 
-                case KeyEvent.KEYCODE_DPAD_RIGHT:
-                    if(mMouseX + mMoveDis + mOffsetX <=getMeasuredWidth()){
+                case KeyEvent.KEYCODE_DPAD_RIGHT://右
+                    if (mMouseX + mMoveDis + mOffsetX <= getMeasuredWidth()) {
                         mMouseX += mMoveDis;
-                    }else{
+                    } else {
                         mMouseX = getMeasuredWidth() - mOffsetX;
                     }
-                    sendMotionEvent(webView,mMouseX , mMouseY,MotionEvent.ACTION_HOVER_MOVE);
+                    sendMotionEvent(webView, mMouseX, mMouseY, MotionEvent.ACTION_HOVER_MOVE);
                     requestLayout();
                     break;
-                case KeyEvent.KEYCODE_DPAD_UP:
-                    if(mMouseY - mMoveDis >= 0) {
+                case KeyEvent.KEYCODE_DPAD_UP://上
+                    if (mMouseY - mMoveDis >= 0) {
                         mMouseY -= mMoveDis;
-                    }else {
+                    } else {
                         mMouseY = 0;
-                        if(webView.getScrollY() - mMoveDis >= 0) {
+                        if (webView.getScrollY() - mMoveDis >= 0) {
                             webView.scrollBy(0, -mMoveDis);
                         }
                     }
-                    sendMotionEvent(webView,mMouseX , mMouseY,MotionEvent.ACTION_HOVER_MOVE);
+                    sendMotionEvent(webView, mMouseX, mMouseY, MotionEvent.ACTION_HOVER_MOVE);
                     requestLayout();
                     break;
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                    if(mMouseY + mMoveDis + mOffsetY <=getMeasuredHeight()){
+                case KeyEvent.KEYCODE_DPAD_DOWN://下
+                    if (mMouseY + mMoveDis + mOffsetY <= getMeasuredHeight()) {
                         mMouseY += mMoveDis;
-                    }else{
+                    } else {
                         mMouseY = getMeasuredHeight() - mOffsetY;
-                        if((webView.getContentHeight()*webView.getScale() - webView.getHeight()) - webView.getScrollY() >= 0) {
-                            webView.scrollBy(0, mMoveDis);
-                        }
+//                        if ((webView.getContentHeight() * webView.getScale() - webView.getHeight()) - webView.getScrollY() >= 0) {
+//                            webView.scrollBy(0, mMoveDis);
+//                        }
+                        webView.scrollBy(0, mMoveDis);
                     }
-                    sendMotionEvent(webView,mMouseX , mMouseY,MotionEvent.ACTION_HOVER_MOVE);
+                    sendMotionEvent(webView, mMouseX, mMouseY, MotionEvent.ACTION_HOVER_MOVE);
                     requestLayout();
                     break;
 
                 case KeyEvent.KEYCODE_ENTER:
                 case KeyEvent.KEYCODE_DPAD_CENTER:
-                    sendMotionEvent(webView,mMouseX+5, mMouseY+5,event.getAction());
+                    sendMotionEvent(webView, mMouseX + 5, mMouseY + 5, event.getAction());
                     break;
 
                 case KeyEvent.KEYCODE_BACK:
-                    if(webView.canGoBack()) {
+                    if (webView.canGoBack()) {
                         webView.goBack();
                     }
                     break;
@@ -192,32 +195,31 @@ public class MouseView extends FrameLayout {
                     return;
             }
         }
-        if(event.getAction() == KeyEvent.ACTION_UP){
-            if(event.getKeyCode() == KeyEvent.KEYCODE_ENTER ||
-                    event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER){
-                sendMotionEvent(webView,mMouseX+5, mMouseY+5,event.getAction());
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER ||
+                    event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
+                sendMotionEvent(webView, mMouseX + 5, mMouseY + 5, event.getAction());
             }
         }
     }
 
     /**
      * 发送一个模拟按键事件
+     *
      * @param webView
      * @param x
      * @param y
      * @param action
      */
-    private void sendMotionEvent(WebView webView,int x, int y, int action){
-        MotionEvent motionEvent = MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), action, x, y, 0);
-        if(action == MotionEvent.ACTION_HOVER_MOVE) {
+    private void sendMotionEvent(WebView webView, int x, int y, int action) {
+        MotionEvent motionEvent = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), action, x, y, 0);
+        if (action == MotionEvent.ACTION_HOVER_MOVE) {
             motionEvent.setSource(InputDevice.SOURCE_CLASS_POINTER);
             webView.dispatchGenericMotionEvent(motionEvent);
-        }else {
+        } else {
             webView.dispatchTouchEvent(motionEvent);
         }
     }
-
-
 
 
 }
