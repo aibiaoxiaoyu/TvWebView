@@ -170,11 +170,13 @@ public class MouseView extends FrameLayout {
                     if (mMouseY + mMoveDis + mOffsetY <= getMeasuredHeight()) {
                         mMouseY += mMoveDis;
                     } else {
+                        //getScrollY()方法返回的是当前可见区域的顶端距整个页面顶端的距离,也就是当前内容滚动的距离.
+                        //getHeight()或者getBottom()方法都返回当前WebView 这个容器的高度
+                        //getContentHeight 返回的是整个html 的高度,但并不等同于当前整个页面的高度,因为WebView 有缩放功能, 所以当前整个页面的高度实际上应该是原始html 的高度再乘上缩放比例.
                         mMouseY = getMeasuredHeight() - mOffsetY;
-//                        if ((webView.getContentHeight() * webView.getScale() - webView.getHeight()) - webView.getScrollY() >= 0) {
-//                            webView.scrollBy(0, mMoveDis);
-//                        }
-                        webView.scrollBy(0, mMoveDis);
+                        if ((webView.getContentHeight() * webView.getScale() - webView.getHeight()) - webView.getScrollY() >= 0) {
+                            webView.scrollBy(0, mMoveDis);
+                        }
                     }
                     sendMotionEvent(webView, mMouseX, mMouseY, MotionEvent.ACTION_HOVER_MOVE);
                     requestLayout();

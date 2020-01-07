@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private TvWebView webView;
     private MouseView mouseView;
 
-    private String expmpleUrl = "https://www.ifeng.com/";
+    private String expmpleUrl = "https://www.baidu.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
