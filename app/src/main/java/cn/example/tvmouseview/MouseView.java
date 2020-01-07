@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -34,8 +35,14 @@ public class MouseView extends FrameLayout {
     private int mMouseY = 0;
 
     //鼠标移动距离  px
-    private int mMoveDis = 15;
+    private static final int DEF_MOVE_DIS = 15;
 
+    //鼠标加速
+    private static final int DEF_INTERVAL_TIMES = 100;
+    private static final int DEF_MAX_SPEED = 4;
+    private long mLastEventTime;
+    private int mSpeed = 1;
+    private boolean isKeyEventCousumed = false;
 
     public MouseView(@NonNull Context context) {
         super(context, null);
@@ -123,6 +130,22 @@ public class MouseView extends FrameLayout {
         mHandler.postDelayed(hideRunnable, 10000);
     }
 
+    private int getPlusSpeed(KeyEvent event) {
+        Log.d(TAG, "getPlusSpeed ,isKeyEventCousumed:" + isKeyEventCousumed);
+        if (!isKeyEventCousumed) {
+            if (event.getDownTime() - mLastEventTime < DEF_INTERVAL_TIMES) {
+                Log.d(TAG, "getPlusSpeed ,speed ++");
+                if (mSpeed < DEF_MAX_SPEED) {
+                    mSpeed++;
+                }
+            } else {
+                mSpeed = 1;
+            }
+        }
+        mLastEventTime = event.getDownTime();
+        return mSpeed;
+    }
+
     /**
      * 按键监听
      * <p>
@@ -132,8 +155,10 @@ public class MouseView extends FrameLayout {
      * @param event
      */
     public void moveMouse(TvWebView webView, KeyEvent event) {
+        Log.d(TAG, "moveMouse ,action:" + event.getAction());
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             setMouseShow();
+            int mMoveDis = getPlusSpeed(event) * DEF_MOVE_DIS;
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_DPAD_LEFT://左
                     if (mMouseX - mMoveDis >= 0) {
@@ -194,6 +219,7 @@ public class MouseView extends FrameLayout {
             }
         }
         if (event.getAction() == KeyEvent.ACTION_UP) {
+            isKeyEventCousumed = false;
             if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER ||
                     event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
                 sendMotionEvent(webView, mMouseX + 5, mMouseY + 5, event.getAction());
