@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private void initSetting() {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
-        String ua = settings.getUserAgentString();
         //see http://www.fynas.com/ua
+        //新大陆，Mozilla/5.0 (Linux; Android 6.0.1; NL-5101 Build/MXC89L; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/44.0.2403.119 Safari/537.36
         //UC手机版 Mozilla/5.0 (Linux; Android 6.0.1; NL-5101 Build/MXC89L; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/44.0.2403.119 Safari/537.36
         //UC平板 (iPad; U; CPU OS 5_1 like Mac OS X) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10
         //UC电脑 (Windows;U;Windows NT 5.2; en-US) AppleWebKit/534.31 (KHTML, like Gecko) Chrome/17.0.558.0 Safari/534.31
@@ -66,6 +66,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            if (webView.canGoBack()) {
+                Log.d(TAG, "goBack");
+                webView.goBack();
+            } else {
+                boolean result = moveTaskToBack(true);
+                Log.d(TAG, "moveTaskToBack result:" + result);
+                return true;
+            }
+        }
         mouseView.moveMouse(webView, event);
         return super.dispatchKeyEvent(event);
     }

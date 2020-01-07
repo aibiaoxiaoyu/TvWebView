@@ -22,7 +22,7 @@ import android.widget.ImageView;
  */
 
 public class MouseView extends FrameLayout {
-
+    private static final String TAG = "MouseView";
     private int mOffsetX;
     private int mOffsetY;
 
@@ -188,11 +188,7 @@ public class MouseView extends FrameLayout {
                     break;
 
                 case KeyEvent.KEYCODE_BACK:
-                    if (webView.canGoBack()) {
-                        webView.goBack();
-                    }
                     break;
-
                 default:
                     return;
             }
